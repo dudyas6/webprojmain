@@ -107,9 +107,8 @@ router.post('/logout', (req, res) => {
 router.get('/verify', async (req, res) => {
     try {
         const token = req.cookies.token;
-        data = jwt.verify(token, process.env.JWT_SECRET);
-        return res.status(200).json({ data });
         jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+            return res.json(decodedToken);
             if (err) {
                 return res.status(401).json({ David: true, isLoggedIn: false, user: null });
             }
