@@ -109,32 +109,21 @@ router.post('/logout', (req, res) => {
 
 router.get('/verify', async (req, res) => {
     try {
-        console.log(req);
-        // Retrieve the token from the HTTP-only cookie
-        const username = req.cookies.username;
-        const user = await User.findOne({ username }).populate('favoriteBooks');
-
-        // Create token
-        const token = jwt.sign(
-            { id: user._id, username: user.username }, 
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }  
-        );
         
-        // Send the JWT in a cookie with appropriate security settings
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',  // Use secure cookies in production environment only
-            maxAge: 3600000,  // 1 hour
-            sameSite: 'None'  // Strict sameSite policy to prevent CSRF
-        });
-        
-        
-        /*if (!token) {
-            return res.status(401).json({ moshe: true, isLoggedIn: false, user: null });
-        }*/
-
-        // Verify the token
+        // console.log(req);
+        // const username = req.cookies.username;
+        // const user = await User.findOne({ username }).populate('favoriteBooks');
+        // const token = jwt.sign(
+        //     { id: user._id, username: user.username }, 
+        //     process.env.JWT_SECRET,
+        //     { expiresIn: '1h' }  
+        // );
+        // res.cookie('token', token, {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === 'production',  // Use secure cookies in production environment only
+        //     maxAge: 3600000,  // 1 hour
+        //     sameSite: 'None'  // Strict sameSite policy to prevent CSRF
+        // });
         jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
             if (err) {
                 return res.status(401).json({ David: true, isLoggedIn: false, user: null });
