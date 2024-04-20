@@ -108,9 +108,8 @@ router.get('/verify', async (req, res) => {
     try {
         const token = req.cookies.token;
         jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
-            return res.json(decodedToken);
             if (err) {
-                return res.status(401).json({ David: true, isLoggedIn: false, user: null });
+                return res.status(401).json("Invalid token or token expired");
             }
             // If token is verified, find the user in the database
             const user = await User.findById(decodedToken.id)
@@ -118,21 +117,22 @@ router.get('/verify', async (req, res) => {
                 .populate('favoriteBooks') // Populate favorite books if they are references to another collection
                 .exec(); // Execute the query
 
-            if (!user) {
-                return res.status(401).json({ yakov: true, isLoggedIn: false, user: null });
-            }
+            res.json({ isLoggedIn: true, user });
+            // if (!user) {
+            //     return res.status(401).json({ yakov: true, isLoggedIn: false, user: null });
+            // }
 
-            // Respond with the user's information if everything is valid
-            res.json({ 
-                isLoggedIn: true, 
-                user: { 
-                    username: user.username, 
-                    email: user.email, 
-                    _id: user._id,
-                    favoriteSubjects: user.favoriteSubjects, 
-                    favoriteBooks: user.favoriteBooks, 
-                } 
-            });        
+            // // Respond with the user's information if everything is valid
+            // res.json({ 
+            //     isLoggedIn: true, 
+            //     user: { 
+            //         username: user.username, 
+            //         email: user.email, 
+            //         _id: user._id,
+            //         favoriteSubjects: user.favoriteSubjects, 
+            //         favoriteBooks: user.favoriteBooks, 
+            //     } 
+            // });        
         });
     } catch (error) {
         res.status(500).json({ isLoggedIn: false, user: null, message: 'Internal server error.' });
