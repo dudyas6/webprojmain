@@ -85,9 +85,6 @@ router.post('/login', async (req, res) => {
             sameSite: 'None'  // Strict sameSite policy to prevent CSRF
         });
 
-        
-        
-        // Respond with user data
         res.json({ message: "Login successful", user: userData });
     } catch (error) {
         console.error("Server error:", error);
@@ -110,34 +107,34 @@ router.post('/logout', (req, res) => {
 router.get('/verify', async (req, res) => {
     try {
         const token = req.cookies.token;
+        data = jwt.verify(token, process.env.JWT_SECRET);
+        return res.status(200).json({ data });
+        jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+            if (err) {
+                return res.status(401).json({ David: true, isLoggedIn: false, user: null });
+            }
+            // If token is verified, find the user in the database
+            const user = await User.findById(decodedToken.id)
+                .select('-password') // Exclude password
+                .populate('favoriteBooks') // Populate favorite books if they are references to another collection
+                .exec(); // Execute the query
 
-        return res.status(200).json({ token, jwt_secret: process.env.JWT_SECRET});
-        // jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
-        //     if (err) {
-        //         return res.status(401).json({ David: true, isLoggedIn: false, user: null });
-        //     }
-        //     // If token is verified, find the user in the database
-        //     const user = await User.findById(decodedToken.id)
-        //         .select('-password') // Exclude password
-        //         .populate('favoriteBooks') // Populate favorite books if they are references to another collection
-        //         .exec(); // Execute the query
+            if (!user) {
+                return res.status(401).json({ yakov: true, isLoggedIn: false, user: null });
+            }
 
-        //     if (!user) {
-        //         return res.status(401).json({ yakov: true, isLoggedIn: false, user: null });
-        //     }
-
-        //     // Respond with the user's information if everything is valid
-        //     res.json({ 
-        //         isLoggedIn: true, 
-        //         user: { 
-        //             username: user.username, 
-        //             email: user.email, 
-        //             _id: user._id,
-        //             favoriteSubjects: user.favoriteSubjects, 
-        //             favoriteBooks: user.favoriteBooks, 
-        //         } 
-        //     });        
-        // });
+            // Respond with the user's information if everything is valid
+            res.json({ 
+                isLoggedIn: true, 
+                user: { 
+                    username: user.username, 
+                    email: user.email, 
+                    _id: user._id,
+                    favoriteSubjects: user.favoriteSubjects, 
+                    favoriteBooks: user.favoriteBooks, 
+                } 
+            });        
+        });
     } catch (error) {
         res.status(500).json({ isLoggedIn: false, user: null, message: 'Internal server error.' });
     }
