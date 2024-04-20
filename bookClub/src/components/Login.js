@@ -42,12 +42,12 @@ const Login = ({ isDarkMode }) => {
             // After successful login, set cookies and auth state
             setAuth(userData);
             console.log(userData);
-            res.cookie('isLoggedIn', 'true', { 
+            Cookies.set('isLoggedIn', 'true', { 
                 expires: 1, // Expires in 1 day
                 sameSite: 'None', // Allow cross-site requests
                 secure: true // Cookie sent only over HTTPS
             });
-            res.cookie('username', userData.username, { 
+            Cookies.set('username', userData.username, { 
                 expires: 1, // Expires in 1 day
                 sameSite: 'None', // Allow cross-site requests
                 secure: true // Cookie sent only over HTTPS
