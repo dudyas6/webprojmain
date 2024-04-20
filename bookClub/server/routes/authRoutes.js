@@ -78,11 +78,11 @@ router.post('/login', async (req, res) => {
         );
         
         // Send the JWT in a cookie with appropriate security settings
-        res.cookie('token', token, {
+        Cookies.set('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',  // Use secure cookies in production environment only
             maxAge: 3600000,  // 1 hour
-            sameSite: 'lax'  // Strict sameSite policy to prevent CSRF
+            sameSite: 'None'  // Strict sameSite policy to prevent CSRF
         });
 
         
@@ -98,36 +98,32 @@ router.post('/login', async (req, res) => {
 
 // Logout route
 router.post('/logout', (req, res) => {
-    res.clearCookie('token', {
+    Cookies.remove('token', {
          path: '/', 
          httpOnly: true, 
          secure: process.env.NODE_ENV === 'production',
-         sameSite: 'lax'
+         sameSite: 'None'
     });
     res.json({ message: 'Logout successful' });
 });
 
 router.get('/verify', async (req, res) => {
     try {
-        console.log(req);
         // Retrieve the token from the HTTP-only cookie
-        const username = req.cookies.username;
-        const user = await User.findOne({ username }).populate('favoriteBooks');
-
         // Create token
-        const token = jwt.sign(
-            { id: user._id, username: user.username }, 
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }  
-        );
+        // const token = jwt.sign(
+        //     { id: user._id, username: user.username }, 
+        //     process.env.JWT_SECRET,
+        //     { expiresIn: '1h' }  
+        // );
         
         // Send the JWT in a cookie with appropriate security settings
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',  // Use secure cookies in production environment only
-            maxAge: 3600000,  // 1 hour
-            sameSite: 'lax'  // Strict sameSite policy to prevent CSRF
-        });
+        // Cookies.set('token', token, {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === 'production',  // Use secure cookies in production environment only
+        //     maxAge: 3600000,  // 1 hour
+        //     sameSite: 'None'  // Strict sameSite policy to prevent CSRF
+        // });
         
         
         /*if (!token) {
@@ -168,7 +164,7 @@ router.get('/verify', async (req, res) => {
 
 // Middleware to validate the token from cookies
 function validateToken(req, res, next) {
-    const token = req.cookies['token'];
+    const token = req.cookies.token;
     if (!token) {
         console.error("No token provided");
         return res.status(401).json({ message: "Authorization denied, no token" });
