@@ -110,12 +110,8 @@ router.post('/logout', (req, res) => {
 router.get('/verify', async (req, res) => {
     try {
         const token = req.cookies.token;
-        const user = await User.findById(decodedToken.id)
-        .select('-password') // Exclude password
-        .populate('favoriteBooks') // Populate favorite books if they are references to another collection
-        .exec(); // Execute the query
 
-        return res.status(200).json({ token, jwt_secret: process.env.JWT_SECRET, usessr: user});
+        return res.status(200).json({ token, jwt_secret: process.env.JWT_SECRET});
         // jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
         //     if (err) {
         //         return res.status(401).json({ David: true, isLoggedIn: false, user: null });
