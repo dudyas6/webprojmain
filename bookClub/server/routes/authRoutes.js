@@ -118,7 +118,7 @@ router.get('/verify', async (req, res) => {
                 .exec(); // Execute the query
 
             if (!user) {
-                return res.status(401).json({ yakov: true, isLoggedIn: false, user: null });
+                return res.status(401).json({ Reason: "No user found in DB", isLoggedIn: false, user: null });
             }
 
             // Respond with the user's information if everything is valid
